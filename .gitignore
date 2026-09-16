@@ -1,0 +1,16 @@
+# Logs
+error_log
+*.log
+
+# Cache & scratch
+scratch/
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+push_to_gitlab.bat
+*.bat

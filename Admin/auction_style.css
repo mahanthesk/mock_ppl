@@ -1,0 +1,173 @@
+/* auction_style.css — Modern White Sports Theme Design System */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap');
+
+:root {
+    --gold: #0284c7;
+    --gold-light: #0ea5e9;
+    --gold-dark: #0369a1;
+    --gold-gradient: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+    --gold-btn-gradient: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+    --black: #0f172a;
+    --dark-gray: #f8fafc;
+    --glass: #ffffff;
+    --glass-border: #e2e8f0;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+    --transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+body {
+    background-image: url('assets/ppl-cricket-bg.png') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-attachment: fixed !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Glassmorphism Cards for White Theme */
+.glass-card {
+    background: #ffffff !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    transition: var(--transition) !important;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05) !important;
+    color: #0f172a !important;
+}
+
+.glass-card:hover {
+    transform: translateY(-3px);
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.09) !important;
+}
+
+/* Headings */
+h1, h2, h3, h4, .heading-gold {
+    font-family: var(--font-heading);
+    color: #0f2a4a;
+    font-weight: 800;
+}
+
+/* Gold / Brand Action Button */
+.btn-gold {
+    background: var(--gold-btn-gradient) !important;
+    color: #ffffff !important;
+    font-family: var(--font-heading) !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 25px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: var(--transition) !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35) !important;
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(2, 132, 199, 0.45) !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #10b981 100%) !important;
+}
+
+/* Stamp Effect */
+.stamp-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.stamp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(5);
+    opacity: 0;
+    z-index: 10;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.stamp.active {
+    transform: translate(-50%, -50%) scale(1) rotate(-15deg);
+    opacity: 1;
+}
+
+.sold-stamp {
+    color: #059669 !important;
+    border: 6px solid #059669 !important;
+    background: rgba(209, 250, 229, 0.95) !important;
+    padding: 12px 36px;
+    font-size: 3.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-radius: 18px;
+    font-family: var(--font-heading);
+    box-shadow: 0 0 35px rgba(5, 150, 105, 0.3) !important;
+}
+
+.unsold-stamp {
+    color: #dc2626 !important;
+    border: 6px solid #dc2626 !important;
+    background: rgba(254, 226, 226, 0.95) !important;
+    padding: 12px 36px;
+    font-size: 3.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-radius: 18px;
+    font-family: var(--font-heading);
+    box-shadow: 0 0 35px rgba(220, 38, 38, 0.25) !important;
+}
+
+/* Custom Navigation Badge */
+.gold-badge {
+    background: #e0f2fe !important;
+    border: 1px solid rgba(2, 132, 199, 0.25) !important;
+    color: var(--gold) !important;
+    font-weight: 700 !important;
+    border-radius: 20px !important;
+    padding: 4px 12px !important;
+}
+
+/* Table Style */
+.premium-table {
+    background: #ffffff !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+}
+
+.premium-table thead th {
+    background: #28779b !important;
+    color: #ffffff !important;
+    font-family: var(--font-heading);
+    border: none !important;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 14px 18px !important;
+}
+
+.premium-table td {
+    color: #1e293b !important;
+    border-top: 1px solid #f1f5f9 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 14px 18px !important;
+}
+
+.premium-table tr:hover td {
+    background: #f8fafc !important;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5); }
+    70% { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+.pulse-animation { animation: pulse 2s infinite; }

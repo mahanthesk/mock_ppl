@@ -1,0 +1,2469 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretium Premier League Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&amp;family=Poppins:wght@300;400;600&amp;display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Three.js & GSAP for Intro -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+    <style>
+        /* CSS Variables & Global Styles */
+        :root {
+            --gold: #D4AF37;
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F5D76E 50%, #B8860B 100%);
+            --black: #000000;
+            --dark-gray: #1a1a1a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(212, 175, 55, 0.3);
+            --font-heading: 'Cinzel', serif;
+            --font-body: 'Poppins', sans-serif;
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--black);
+            color: #fff;
+            font-family: var(--font-body);
+            overflow: hidden;
+            /* Prevent scroll initially */
+            min-height: 100vh;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #hero.hidden {
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        #intro-canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background-color: #000;
+            pointer-events: all;
+        }
+
+        .visible-flow {
+            overflow-y: auto !important;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            /* Center content */
+            align-items: center;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.5);
+            transform: translateY(-100%);
+            transition: transform 0.5s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        header.visible {
+            transform: translateY(0);
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        .header-logo span {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        /* ... Existing Styles ... */
+
+        /* 4. Confirmation Modal - Premium Redesign */
+        #confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal-content {
+            text-align: center;
+            padding: 3px;
+            /* For double border effect */
+            background: linear-gradient(135deg, #D4AF37, #F5D76E);
+            border-radius: 12px;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.4);
+            max-width: 550px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-inner {
+            background: #111;
+            padding: 50px 30px;
+            border-radius: 9px;
+            position: relative;
+        }
+
+        /* Decoration lines */
+        .modal-inner::before,
+        .modal-inner::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .modal-inner::before {
+            top: 30px;
+        }
+
+        .modal-inner::after {
+            bottom: 30px;
+        }
+
+        #confirmation-modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .player-card-summary {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background: linear-gradient(to right, rgba(212, 175, 55, 0.1), transparent);
+            border-left: 4px solid var(--gold);
+            font-family: var(--font-body);
+        }
+
+        .player-card-summary p {
+            margin: 8px 0;
+            font-size: 1.05rem;
+            color: #eee;
+        }
+
+        .player-card-summary strong {
+            color: var(--gold);
+            margin-right: 10px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: bounceIn 1s ease;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .gold-text {
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-gold {
+            background: var(--gold-gradient);
+            color: var(--black);
+            padding: 12px 30px;
+            border: none;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+        }
+
+        .btn-gold:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+
+        /* 2. Main Hero Section */
+        #hero {
+            height: 100vh;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 1;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Light Burst behind logo */
+        .logo-backdrop {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 1s ease 0.5s;
+        }
+
+        #hero.visible .logo-backdrop {
+            opacity: 1;
+        }
+
+        .logo-container {
+            position: relative;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Bounce out effect */
+        }
+
+        #hero.visible .logo-container {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .logo-container img {
+            max-width: 200px;
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.6));
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        .hero-title {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            background: var(--gold-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        /* 3. Registration Form Section */
+        #registration-section {
+            min-height: 100vh;
+            padding: 80px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        #registration-section.visible {
+            opacity: 1;
+        }
+
+        .form-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 4px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, var(--gold), transparent);
+            z-index: -1;
+            opacity: 0.3;
+            border-radius: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gold);
+            font-family: var(--font-heading);
+            letter-spacing: 1px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        /* Dropdown Option Fix */
+        .form-select option {
+            background: #eece63;
+            color: black;
+            font-weight: bold;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .validation-error {
+            border: 2px solid #ff4444 !important;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.4) !important;
+            animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        .validation-error {
+            border: 2px solid #ff4444 !important;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.4) !important;
+            animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .section-divider {
+            border-top: 1px solid var(--glass-border);
+            margin: 30px 0 20px;
+            position: relative;
+            text-align: center;
+        }
+
+        .section-divider span {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0d0d0d;
+            padding: 5px 15px;
+            border-radius: 15px;
+            color: var(--gold);
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Hand Selection (Image-based Radios) */
+        .hand-selection {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .hand-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .hand-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .hand-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hand-box svg {
+            width: 30px;
+            height: 30px;
+            fill: #666;
+            transition: var(--transition);
+        }
+
+        .hand-box span {
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hand-option input:checked+.hand-box {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .hand-option input:checked+.hand-box svg {
+            fill: var(--gold);
+        }
+
+        .hand-option input:checked+.hand-box span {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        /* Profile Photo Upload */
+        .photo-upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px dashed #333;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .photo-upload-container:hover {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.02);
+        }
+
+        #photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--gold);
+            margin-bottom: 15px;
+            display: none;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .photo-placeholder {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #D4AF37 0%, #F5D76E 50%, #B8860B 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .photo-placeholder svg {
+            width: 40px;
+            height: 40px;
+            fill: #444;
+        }
+
+        /* 4. Confirmation Modal */
+        #confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Old Modal Styles Removed/Overridden */
+
+        .player-card-summary {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--gold);
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 201;
+        }
+
+
+
+        @keyframes logoFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Mobile Responsive */
+        /* Mobile Responsive for Hero/Logo */
+        @media (max-width: 768px) {
+
+            /* 1. Header Responsive */
+            header {
+                padding: 10px 15px;
+            }
+
+            .header-logo img {
+                height: 35px;
+            }
+
+            .header-logo span {
+                font-size: 0.9rem;
+                letter-spacing: 1px;
+            }
+
+            /* 2. Hero Section */
+            .hero-title {
+                font-size: 2rem;
+                margin: 15px 0 5px;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .logo-container img {
+                max-width: 150px;
+                /* Smaller for mobile to fit */
+            }
+
+            .logo-backdrop {
+                width: 250px;
+                height: 250px;
+            }
+
+            /* 3. Curtain Raiser */
+            /* Ensure overlap to avoid gaps */
+            .curtain {
+                width: 60%;
+            }
+
+            /* Adjust curvature for portrait screens */
+
+
+            /* 4. Form & UI */
+            .form-card {
+                padding: 25px 15px;
+            }
+
+            #registration-section {
+                padding: 80px 10px;
+                /* Less side padding */
+            }
+        }
+
+        /* 4. Confirmation Section (Full Screen) */
+        #confirmation-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 200;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #confirmation-section.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .confirmation-content {
+            background: transparent;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0.9);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #confirmation-section.visible .confirmation-content {
+            transform: scale(1);
+        }
+
+        /* Modern ID Card Redesign */
+        #player-card {
+            width: 380px;
+            /* aspect-ratio: 1 / 1.58; */
+            background: #050505;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+            padding: 0;
+            margin-bottom: 15px;
+            /* Control padding in sub-elements */
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .card-bg-glow {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .card-accent-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(to bottom, rgba(212, 175, 55, 0.2), transparent);
+            clip-path: polygon(0 0, 100% 0, 100% 60%, 0 100%);
+        }
+
+        .card-header-v2 {
+            padding: 25px 20px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-logo-v2 {
+            height: 45px;
+        }
+
+        .card-spl-info {
+            text-align: center;
+        }
+
+        .card-spl-info .spl-text {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            font-size: 1.4rem 22.4px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .card-spl-info .season-text {
+            font-size: 0.6rem;
+            color: #888;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .card-body-v2 {
+            padding: 0 25px;
+            position: relative;
+            z-index: 2;
+            /* flex-grow: 1; */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card-photo-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 5px;
+            background: var(--gold-gradient);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-profile-photo {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            background: #111;
+        }
+
+        .card-player-id {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-name-v2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .card-fullname {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: #fff;
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .card-nickname {
+            font-size: 0.8rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .card-info-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .info-box {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.55rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .info-value {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card-footer-v2 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px 25px;
+            background: linear-gradient(to top, rgba(212, 175, 55, 0.05), transparent);
+            position: relative;
+            z-index: 2;
+        }
+
+        .jersey-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .jersey-icon-mini {
+            width: 20px;
+            height: 20px;
+            fill: var(--gold);
+        }
+
+        .jersey-num-text {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--gold);
+            font-family: var(--font-heading);
+        }
+
+        .card-city-text {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Category Selection */
+        .category-selection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .category-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .category-option {
+            position: relative;
+        }
+
+        .category-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .category-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 80px;
+        }
+
+        .category-box i {
+            font-size: 1.5rem;
+            color: #666;
+            transition: var(--transition);
+        }
+
+        .category-box span {
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .category-option input:checked+.category-box {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .category-option input:checked+.category-box i {
+            color: var(--gold);
+        }
+
+        .category-option input:checked+.category-box span {
+            color: var(--gold);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+
+            /* 1. Header Responsive */
+            header {
+                padding: 10px 15px;
+            }
+
+            .header-logo img {
+                height: 35px;
+            }
+
+            .header-logo span {
+                font-size: 0.9rem;
+                letter-spacing: 1px;
+            }
+
+            /* 2. Hero Section */
+            .hero-title {
+                font-size: 2rem;
+                margin: 15px 0 5px;
+                line-height: 1.2;
+            }
+
+            .hero-subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 2rem;
+                letter-spacing: 2px;
+                padding: 0 10px;
+            }
+
+            .logo-container img {
+                max-width: 180px;
+            }
+
+            .logo-backdrop {
+                width: 300px;
+                height: 300px;
+            }
+
+
+
+            /* 4. Form & UI */
+            .form-card {
+                padding: 25px 15px;
+                margin: 20px;
+            }
+
+            #registration-section {
+                padding: 80px 10px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            /* 5. Player Card Responsive */
+            #player-card {
+                width: 320px;
+                margin: 0 20px;
+            }
+
+            .card-header-v2 {
+                padding: 20px 15px 10px;
+            }
+
+            .card-body-v2 {
+                padding: 0 15px;
+            }
+
+            .card-profile-photo {
+                width: 110px;
+                height: 110px;
+            }
+
+            .card-fullname {
+                font-size: 1.3rem;
+            }
+
+            .card-info-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .card-footer-v2 {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            /* 6. Action buttons responsive */
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .action-buttons button {
+                width: 100%;
+            }
+
+            /* 7. Modal responsive */
+            .modal-content {
+                width: 95%;
+                margin: 0 10px;
+            }
+
+            .modal-inner {
+                padding: 40px 20px;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 480px) {
+
+            /* 1. Hero adjustments for very small screens */
+            .hero-title {
+                font-size: 1.7rem;
+            }
+
+            .hero-subtitle {
+                font-size: 0.8rem;
+                letter-spacing: 1px;
+            }
+
+            .logo-container img {
+                max-width: 150px;
+            }
+
+            /* 2. Player card for very small screens */
+            #player-card {
+                width: 280px;
+                transform: scale(0.9);
+            }
+
+            .card-profile-photo {
+                width: 100px;
+                height: 100px;
+            }
+
+            .card-fullname {
+                font-size: 1.2rem;
+            }
+
+            .card-nickname {
+                font-size: 0.75rem;
+            }
+
+            .card-info-grid {
+                grid-template-columns: 1fr;
+                text-align: left;
+            }
+
+            .info-box {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+            }
+
+            /* 3. Form improvements */
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .hand-selection {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+
+
+            /* 5. Body overflow fix */
+            body {
+                overflow-x: hidden;
+            }
+        }
+
+        /* Tablet adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .logo-container img {
+                max-width: 250px;
+            }
+
+            #player-card {
+                width: 350px;
+            }
+
+            .form-card {
+                max-width: 500px;
+            }
+        }
+
+        /* Landscape mode on mobile */
+        @media (max-height: 600px) and (max-width: 768px) {
+            #hero {
+                padding-top: 100px;
+                padding-bottom: 50px;
+                min-height: 100vh;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+                margin: 10px 0;
+            }
+
+            .hero-subtitle {
+                margin-bottom: 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .logo-container {
+                margin: 10px 0;
+            }
+
+            .logo-container img {
+                max-width: 140px;
+            }
+        }
+
+        /* Prevent horizontal scrolling on mobile */
+        html,
+        body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Improve touch targets for mobile */
+        @media (max-width: 768px) {
+            .btn-gold {
+                padding: 14px 20px;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .form-input,
+            .form-select {
+                padding: 14px;
+                font-size: 16px;
+                /* Prevents iOS zoom on focus */
+            }
+
+            .hand-box {
+                padding: 12px;
+                min-height: 70px;
+            }
+
+            /* Ensure buttons and inputs are easily tappable */
+            button,
+            input,
+            select {
+                min-height: 44px;
+            }
+        }
+
+        /* Fix for iOS Safari viewport height */
+        @supports (-webkit-touch-callout: none) {
+
+            #hero,
+            #confirmation-section {
+                height: -webkit-fill-available;
+            }
+        }
+
+        .opacity-enabled {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .margt-2 {
+            margin-top: 20px;
+        }
+
+        #hero {
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        #hero.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        /* Completely disable hero once hidden */
+        #hero.hidden {
+            display: none !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Error Styles */
+        .form-input.error,
+        .form-select.error {
+            border: 2px solid #ff4444 !important;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.4) !important;
+            animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .hand-box.error,
+        .category-box.error {
+            border: 2px solid #ff4444 !important;
+            background: rgba(255, 68, 68, 0.1) !important;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        /* Focus on error field */
+        .error-field:focus {
+            outline: 2px solid #ff4444 !important;
+            outline-offset: 2px;
+        }
+
+        /* Curtain Raiser & Intro Styles */
+        #curtain-raiser {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .curtain {
+            position: absolute;
+            top: 0;
+            height: 110%;
+            width: 55%;
+            background: linear-gradient(90deg, #1a0000 0%, #4a0000 50%, #1a0000 100%);
+            box-shadow: inset 10px 0 20px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            transition: transform 3s cubic-bezier(0.6, 0.05, 0.1, 1);
+            border-bottom-left-radius: 50% 20%;
+            border-bottom-right-radius: 50% 20%;
+            transition: transform 3s cubic-bezier(0.6, 0.05, 0.1, 1), opacity 1s ease 2s;
+        }
+
+        .curtain::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(0, 0, 0, 0.3) 60px, transparent 80px);
+            opacity: 0.5;
+        }
+
+        #left-curtain {
+            left: 0;
+            transform-origin: top left;
+            border-bottom-right-radius: 40% 100px;
+            border-bottom-left-radius: 0;
+            width: 51%;
+            z-index: 102;
+        }
+
+        #right-curtain {
+            right: 0;
+            transform-origin: top right;
+            border-bottom-left-radius: 40% 100px;
+            border-bottom-right-radius: 0;
+            width: 51%;
+            z-index: 102;
+        }
+
+        #stage-floor {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25%;
+            background: linear-gradient(to top, #1a0505, #4a0404);
+            transform: perspective(1000px) rotateX(20deg) scale(1.2);
+            z-index: 101;
+            box-shadow: inset 0 0 100px #000;
+        }
+
+        /* Welcome Text Style */
+        #intro-text-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 110;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #intro-text-container.show {
+            animation: fadeInOut 4s ease-in-out forwards;
+        }
+
+        #intro-text-container h1 {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            letter-spacing: 4px;
+        }
+
+        #intro-text-container h3 {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -30%);
+            }
+
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -70%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #intro-text-container h1 {
+                font-size: 2rem;
+            }
+
+            #intro-text-container h3 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Intro Image Block Styles */
+        #intro-image-block {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 90;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 2s ease;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        #intro-image-block.visible {
+            opacity: 1;
+        }
+
+        #intro-image-block img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* Ensure full image is visible */
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.3));
+        }
+
+        /* Mobile adjustments for curtain */
+        @media (max-width: 768px) {
+            .curtain {
+                width: 60%;
+            }
+
+            #left-curtain {
+                border-bottom-right-radius: 30% 80px;
+            }
+
+            #right-curtain {
+                border-bottom-left-radius: 30% 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Welcome Text Section -->
+    <div id="intro-text-container">
+        <h1>WELCOME TO</h1>
+        <h3>PRETIUM PREMIER LEAGUE</h3>
+    </div>
+
+    <!-- Curtain Raiser Section -->
+    <div id="curtain-raiser">
+        <div id="left-curtain" class="curtain"></div>
+        <div id="right-curtain" class="curtain"></div>
+        <div id="stage-floor"></div>
+        <div id="intro-text-container">
+            <h1>WELCOME TO</h1>
+            <h3>PRETIUM PREMIER LEAGUE</h3>
+            <h5>Season - 2</h3>
+        </div>
+    </div>
+
+    <!-- Intro Image Block (Now shows the image) -->
+    <div id="intro-image-block">
+        <img src="assets/PPL-Intro.jpeg" alt="PPL Intro Image">
+    </div>
+
+    <!-- Header (Hidden initially) -->
+    <header id="app-header">
+        <div class="header-logo">
+            <img src="assets/PPL-Season-2.png" alt="PPL Logo">
+            <span>Pretium Premier League</span>
+        </div>
+    </header>
+
+
+
+    <!-- Main Hero Section -->
+    <section id="hero" class="hidden">
+
+        <div class="logo-backdrop"></div>
+        <div class="logo-container">
+            <img src="assets/PPL-Season-2.png" alt="PPL Logo" id="main-logo">
+        </div>
+        <h1 class="hero-title">Pretium<br>Premier League</h1>
+        <p class="hero-subtitle">Season 2</p>
+        <button id="register-btn" class="btn-gold">Register Now</button>
+        <div class="logo-container">
+            <img class="margt-2" src="assets/Sandeep-Ventures.png" alt="PPL Logo" id="sandeep-ventures">
+        </div>
+    </section>
+
+    <!-- Registration Form -->
+    <section id="registration-section" class="hidden">
+        <div class="form-card">
+            <h2 class="hero-title" style="font-size: 2rem; margin-bottom: 20px; text-align: center;">Player Registration
+            </h2>
+
+            <form id="registration-form">
+                <!-- Personal Details Section -->
+                <div class="section-divider"><span>Personal Details</span></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="salutation">Salutation</label>
+                        <select id="salutation" name="salutation" class="form-select" required="">
+                            <option value="Mr.">Mr.</option>
+                            <option value="Ms.">Ms.</option>
+                            <option value="Mrs.">Mrs.</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="full-name">Full Name</label>
+                        <input type="text" id="full-name" name="full_name" class="form-input" required=""
+                            placeholder="Enter your full name">
+                        <span class="error-message" id="full-name-error"></span>
+                    </div>
+                </div>
+
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="mobile">Mobile Number</label>
+                        <input type="tel" id="mobile" name="mobile" class="form-input" required=""
+                            placeholder="+91 XXXXX XXXXX">
+                        <span class="error-message" id="mobile-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-input" required=""
+                            placeholder="name@example.com">
+                        <span class="error-message" id="email-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="address">Address</label>
+                    <textarea id="address" name="address" class="form-input" rows="3"
+                        placeholder="Enter your full address" style="resize: none;"></textarea>
+                    <span class="error-message" id="address-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <div class="category-selection">
+                        <div class="category-option">
+                            <input type="radio" id="category-celebrities" name="category" value="Celebrities" required>
+                            <label for="category-celebrities" class="category-box">
+                                <img src="assets/celebrity-white.png" alt="right-bat" height="80px">
+                                <span>Celebrities</span>
+                            </label>
+                        </div>
+                        <div class="category-option">
+                            <input type="radio" id="category-female-celebrities" name="category"
+                                value="Female Celebrities" required>
+                            <label for="category-female-celebrities" class="category-box">
+                                <img src="assets/female-influencer-white.png" alt="right-bat" height="80px">
+                                <span>Female Celebrities</span>
+                            </label>
+                        </div>
+                        <div class="category-option">
+                            <input type="radio" id="category-directors" name="category" value="Directors" required>
+                            <label for="category-directors" class="category-box">
+                                <img src="assets/director.png" alt="right-bat" height="80px">
+                                <span>Directors</span>
+                            </label>
+                        </div>
+                        <div class="category-option">
+                            <input type="radio" id="category-producers" name="category" value="Producers" required>
+                            <label for="category-producers" class="category-box">
+                                <img src="assets/producer.png" alt="right-bat" height="80px">
+                                <span>Producers</span>
+                            </label>
+                        </div>
+                        <div class="category-option">
+                            <input type="radio" id="category-media" name="category" value="Media" required>
+                            <label for="category-media" class="category-box">
+                                <img src="assets/media.png" alt="right-bat" height="80px">
+                                <span>Media</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="photo-upload-container">
+                        <div class="photo-placeholder" id="placeholder-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z">
+                                </path>
+                            </svg>
+                        </div>
+                        <img id="photo-preview" src="#" alt="Profile Preview">
+                        <label for="profile-pic" class="btn-gold"
+                            style="padding: 8px 20px; font-size: 0.8rem; cursor: pointer;">Upload Photo</label>
+                        <input type="file" id="profile-pic" name="profile_pic" accept="image/*" style="display: none;">
+                        <span class="error-message" id="profile-pic-error"></span>
+                        <p style="font-size: 0.7rem; color: #666; margin-top: 10px;">Max size 2MB. Square crop
+                            recommended.</p>
+                    </div>
+                </div>
+
+                <!-- Conditional ID Upload for Producer/Media -->
+                <div class="form-group hidden" id="prod-media-id-container">
+                    <label class="form-label" id="prod-media-label">Producer ID Card</label>
+                    <input type="file" id="prod-media-id-file" name="prod_media_id_file" class="form-input"
+                        accept="image/*,.pdf">
+                    <span class="error-message" id="prod-media-id-file-error"></span>
+                    <p style="font-size: 0.7rem; color: #aaa; margin-top: 5px;">Upload ID Card/Proof (Image or PDF)</p>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const categoryRadios = document.querySelectorAll('input[name="category"]');
+                        const idContainer = document.getElementById('prod-media-id-container');
+                        const idLabel = document.getElementById('prod-media-label');
+                        const idInput = document.getElementById('prod-media-id-file');
+
+                        function toggleIdField() {
+                            const selected = document.querySelector('input[name="category"]:checked');
+                            if (selected) {
+                                const val = selected.value;
+                                if (val === 'Producers' || val === 'Media') {
+                                    idContainer.classList.remove('hidden');
+                                    idLabel.textContent = (val === 'Producers' ? 'Producer ID Card' : 'Media ID Card');
+                                    idInput.required = true;
+                                } else {
+                                    idContainer.classList.add('hidden');
+                                    idInput.required = false;
+                                    idInput.value = ''; // Clear value
+                                }
+                            }
+                        }
+
+                        categoryRadios.forEach(radio => {
+                            radio.addEventListener('change', toggleIdField);
+                        });
+                    });
+                </script>
+
+                <div class="section-divider">
+                    <span>Cricket Details</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="role">Role</label>
+                        <select id="role" name="role" class="form-select" required="">
+                            <option value="" disabled="" selected="">Select Role</option>
+                            <option value="Batsman">Batsman</option>
+                            <option value="Bowler">Bowler</option>
+                            <option value="All-rounder">All-rounder</option>
+                            <option value="Wicket Keeper">Wicket Keeper</option>
+                        </select>
+                        <span class="error-message" id="role-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="experience">Experience</label>
+                        <select id="experience" name="experience" class="form-select" required="">
+                            <option value="" disabled="" selected="">Level</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                        <span class="error-message" id="experience-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Batting Type</label>
+                        <div class="hand-selection">
+                            <div class="hand-option">
+                                <input type="radio" id="bat-right" name="batting_type" value="Right" required>
+                                <label for="bat-right" class="hand-box">
+                                    <img src="assets/Left-bat.png" alt="left-bat" height="80px">
+                                    <span>Left Hand</span>
+                                </label>
+                            </div>
+                            <div class="hand-option">
+                                <input type="radio" id="bat-left" name="batting_type" value="Left" required>
+                                <label for="bat-left" class="hand-box">
+                                    <img src="assets/Right-bat.png" alt="right-bat" height="80px">
+                                    <span>Right Hand</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bowling Type</label>
+                        <div class="hand-selection">
+                            <div class="hand-option">
+                                <input type="radio" id="bowl-right" name="bowling_type" value="Right" required>
+                                <label for="bowl-right" class="hand-box">
+                                    <img src="assets/left-hand-bowling.png" alt="right-bat" height="80px">
+                                    <span>Right Arm</span>
+                                </label>
+                            </div>
+                            <div class="hand-option">
+                                <input type="radio" id="bowl-left" name="bowling_type" value="Left" required>
+                                <label for="bowl-left" class="hand-box">
+                                    <img src="assets/right-hand-bowling.png" alt="right-bat" height="80px">
+                                    <span>Left Arm</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-divider">
+                    <span>Jersey Details</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nickname / Screen Name</label>
+                    <input type="text" class="form-input" id="jersey-nickname" name="jersey_nickname"
+                        placeholder="Rocky" required>
+                    <span class="error-message" id="jersey-nickname-error"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Jersey Number</label>
+                    <input type="number" class="form-input" id="jersey-number" name="jersey_number" min="1" max="99"
+                        placeholder="e.g. 007" required>
+                    <span class="error-message" id="jersey-number-error"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="jersey-size">Jersey Size</label>
+                        <select id="jersey-size" name="jersey_size" class="form-select">
+                            <option value="S">S</option>
+                            <option value="M" selected="">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                        </select>
+                        <span class="error-message" id="jersey-size-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Track Pant Size</label>
+                        <input type="number" class="form-input" id="track-pant-size" name="track_pant_size" min="30"
+                            max="50" required>
+                        <span class="error-message" id="track-pant-size-error"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-gold" style="width: 100%; margin-top: 30px; padding: 15px;">Confirm
+                    Registration</button>
+            </form>
+        </div>
+        <div class="text-center">
+            <h6>Technology Partner</h6>
+            <div class="logo-container opacity-enabled">
+                <img class="margt-2" src="assets/ParvaM-logo.png" alt="ParvaM Logo">
+            </div>
+        </div>
+    </section>
+
+    <!-- Confirmation Section -->
+    <section id="confirmation-section">
+        <canvas id="confetti-canvas" width="483" height="706"></canvas>
+        <div class="confirmation-content">
+
+            <h2 class="hero-title" style="font-size: 2rem; margin-bottom: 5px; text-align: center;">Registration
+                Successful!</h2>
+            <!-- <p style="color: #ccc; margin-bottom: 25px; font-style: italic;">Welcome to the Season 2 Arena</p> -->
+
+            <!-- Player Card to Capture -->
+            <!-- Redesigned Modern ID Card -->
+            <div class="mb-2" id="player-card">
+                <div class="card-bg-glow"></div>
+                <div class="card-accent-bar"></div>
+
+                <div class="card-header-v2">
+                    <img src="assets/PPL-Season-2.png" class="card-logo-v2" alt="PPL Logo">
+                    <div class="card-spl-info">
+                        <span class="spl-text">PRETIUM PREMIER LEAGUE</span>
+                        <span class="season-text">SEASON 2 • 2026</span>
+                    </div>
+                </div>
+
+                <div class="card-body-v2">
+                    <div class="card-photo-wrapper">
+                        <img src="" id="card-photo" class="card-profile-photo" alt="Player Photo">
+                        <span class="card-player-id" id="card-id">PPL-0000</span>
+                    </div>
+
+                    <div class="card-name-v2">
+                        <h3 class="card-fullname" id="card-name">PLAYER NAME</h3>
+                        <span class="card-nickname" id="card-nickname">"NICKNAME"</span>
+                    </div>
+
+                    <div class="card-info-grid">
+                        <div class="info-box">
+                            <span class="info-label">ROLE</span>
+                            <span class="info-value" id="card-role">ALL-ROUNDER</span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label">BATTING</span>
+                            <span class="info-value" id="card-bat-type">RIGHT</span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label">BOWLING</span>
+                            <span class="info-value" id="card-bowl-type">RIGHT</span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label">EXP</span>
+                            <span class="info-value" id="card-exp">ADVANCED</span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label">SIZE</span>
+                            <span class="info-value" id="card-size">M</span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-label">MOBILE</span>
+                            <span class="info-value" id="card-mobile">+91 00000 00000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer-v2">
+                    <div class="jersey-badge">
+                        <svg class="jersey-icon-mini" viewBox="0 0 24 24">
+                            <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"></path>
+                        </svg>
+                        <span class="jersey-num-text" id="card-jersey-num">07</span>
+                    </div>
+                    <span class="card-city-text" id="card-city">BANGALORE</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="download-btn" class="btn-gold"
+                    style="font-size: 0.9rem; padding: 10px 20px; display: flex; align-items: center; gap: 8px;">
+                    Download Profile ⬇
+                </button>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap 5 CSS & JS (Added for UI components) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Error Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert"
+            aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="errorToastMessage">
+                    Error message here.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('registration-form');
+
+            // Function to clear all error states
+            function clearAllErrors() {
+                // Remove error classes from all inputs
+                document.querySelectorAll('.form-input.error, .form-select.error').forEach(el => {
+                    el.classList.remove('error');
+                });
+
+                // Remove error classes from hand-box and category-box
+                document.querySelectorAll('.hand-box.error, .category-box.error').forEach(el => {
+                    el.classList.remove('error');
+                });
+
+                // Hide all error messages
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.classList.remove('show');
+                    el.textContent = '';
+                });
+
+                // Also clear any inline borders from radio containers
+                document.querySelectorAll('.hand-selection, .category-selection').forEach(el => {
+                    el.style.border = '';
+                    el.style.padding = '';
+                });
+            }
+
+            // Function to highlight error field
+
+            function showError(fieldName, message, shouldFocus = true) {
+                console.log('Showing error for field:', fieldName, 'Message:', message);
+
+                // Convert field name to match HTML IDs (replace underscores with hyphens)
+                const fieldId = fieldName.replace(/_/g, '-');
+                const field = document.querySelector(`[name="${fieldName}"]`);
+                const errorSpan = document.getElementById(`${fieldId}-error`);
+
+                console.log('Found field:', field, 'Error span:', errorSpan);
+
+                if (field) {
+                    // For radio buttons (handling type and category)
+                    if (field.type === 'radio') {
+                        // Get the parent container
+                        const container = field.closest('.hand-selection') || field.closest('.category-selection');
+                        if (container) {
+                            // Add error class to all boxes in the group
+                            const boxes = container.querySelectorAll('.hand-box, .category-box');
+                            boxes.forEach(box => box.classList.add('error'));
+
+                            // Also add border to the container for visibility
+                            container.style.border = '2px solid #ff4444';
+                            container.style.borderRadius = '4px';
+                            container.style.padding = '5px';
+                            container.style.marginTop = '5px';
+                        }
+                    } else {
+                        // For regular inputs
+                        field.classList.add('error');
+                    }
+
+                    // Focus on the field if requested
+                    if (shouldFocus) {
+                        setTimeout(() => {
+                            if (field.type !== 'radio') {
+                                const formGroup = field.closest('.form-group');
+                                if (formGroup) {
+                                    formGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                } else {
+                                    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                                field.focus({ preventScroll: true });
+                            } else {
+                                // For radio groups, focus on the first option container
+                                const container = field.closest('.hand-selection') || field.closest('.category-selection');
+                                if (container) {
+                                    container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            }
+                        }, 100);
+                    }
+                }
+
+                if (errorSpan) {
+                    errorSpan.textContent = message;
+                    errorSpan.classList.add('show');
+                } else {
+                    console.warn('No error span found for field:', fieldName);
+                }
+            }
+
+
+
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    // Clear previous errors
+                    clearAllErrors();
+
+                    const formData = new FormData(form);
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerText;
+
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = 'Registering...';
+
+                    fetch('register_backend.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            submitBtn.disabled = false;
+                            submitBtn.innerText = originalBtnText;
+
+                            if (data.status === 'success') {
+                                // Hide Registration Form
+                                document.getElementById('registration-section').classList.remove('visible');
+
+                                // 1. Populate Player Card with Response Data
+                                const pData = data.data;
+
+                                // IDs from your HTML
+                                if (pData.profile_pic) {
+                                    document.getElementById('card-photo').src = pData.profile_pic;
+                                }
+
+                                document.getElementById('card-id').textContent = pData.player_id;
+                                document.getElementById('card-name').textContent = pData.full_name;
+                                document.getElementById('card-nickname').textContent = '"' + pData.jersey_nickname + '"';
+                                document.getElementById('card-role').textContent = pData.role.toUpperCase();
+                                document.getElementById('card-bat-type').textContent = pData.batting_type.toUpperCase();
+                                document.getElementById('card-bowl-type').textContent = pData.bowling_type.toUpperCase();
+                                document.getElementById('card-exp').textContent = pData.experience.toUpperCase();
+                                document.getElementById('card-size').textContent = pData.jersey_size;
+                                document.getElementById('card-mobile').textContent = pData.mobile;
+                                document.getElementById('card-jersey-num').textContent = pData.jersey_number.toString().padStart(2, '0');
+
+                                // Show Confirmation Section
+                                const confSection = document.getElementById('confirmation-section');
+                                confSection.classList.add('visible');
+                                confSection.style.pointerEvents = 'all';
+
+                                // Trigger Confetti
+                                if (typeof startConfetti === 'function') startConfetti();
+
+                            } else {
+                                // Show errors with field highlighting
+                                if (data.errors) {
+                                    // Show all error messages but DO NOT focus (pass false)
+                                    Object.keys(data.errors).forEach(fieldName => {
+                                        showError(fieldName, data.errors[fieldName], false);
+                                    });
+
+                                    // Focus on the first error field (pass true or default)
+                                    if (data.error_field) {
+                                        showError(data.error_field, data.errors[data.error_field], true);
+                                    }
+                                } else {
+                                    // Generic error
+                                    const toastEl = document.getElementById('errorToast');
+                                    const toastBody = document.getElementById('errorToastMessage');
+                                    toastBody.textContent = data.message || 'An error occurred';
+                                    const toast = new bootstrap.Toast(toastEl);
+                                    toast.show();
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            submitBtn.disabled = false;
+                            submitBtn.innerText = originalBtnText;
+                            console.error('Error:', error);
+
+                            const toastEl = document.getElementById('errorToast');
+                            const toastBody = document.getElementById('errorToastMessage');
+                            toastBody.textContent = 'Network or Server Error: ' + error.message;
+                            const toast = new bootstrap.Toast(toastEl);
+                            toast.show();
+                        });
+                });
+            }
+
+            // Add input event listeners to clear errors when user starts typing
+            document.querySelectorAll('.form-input, .form-select').forEach(input => {
+                input.addEventListener('input', function () {
+                    this.classList.remove('error');
+                    const fieldName = this.name;
+                    const fieldId = fieldName.replace(/_/g, '-');
+                    const errorSpan = document.getElementById(`${fieldId}-error`);
+                    if (errorSpan) {
+                        errorSpan.classList.remove('show');
+                    }
+                });
+            });
+
+            // For textarea
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.addEventListener('input', function () {
+                    this.classList.remove('error');
+                    const fieldName = this.name;
+                    const fieldId = fieldName.replace(/_/g, '-');
+                    const errorSpan = document.getElementById(`${fieldId}-error`);
+                    if (errorSpan) {
+                        errorSpan.classList.remove('show');
+                    }
+                });
+            });
+
+            // For radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const fieldName = this.name;
+                    const container = this.closest('.hand-selection') || this.closest('.category-selection');
+                    if (container) {
+                        const boxes = container.querySelectorAll('.hand-box, .category-box');
+                        boxes.forEach(box => box.classList.remove('error'));
+                        container.style.border = '';
+                        container.style.padding = '';
+                        container.style.marginTop = '';
+                    }
+                    const fieldId = fieldName.replace(/_/g, '-');
+                    const errorSpan = document.getElementById(`${fieldId}-error`);
+                    if (errorSpan) {
+                        errorSpan.classList.remove('show');
+                    }
+                });
+            });
+
+            // For file inputs
+            document.querySelectorAll('input[type="file"]').forEach(fileInput => {
+                fileInput.addEventListener('change', function () {
+                    this.classList.remove('error');
+                    const fieldName = this.name;
+                    const fieldId = fieldName.replace(/_/g, '-');
+                    const errorSpan = document.getElementById(`${fieldId}-error`);
+                    if (errorSpan) {
+                        errorSpan.classList.remove('show');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.getElementById('app-header');
+            const heroSection = document.getElementById('hero');
+            const registerBtn = document.getElementById('register-btn');
+            const registrationSection = document.getElementById('registration-section');
+            const form = document.getElementById('registration-form');
+            const confirmationSection = document.getElementById('confirmation-section');
+            const homeBtn = document.getElementById('home-btn');
+            const downloadBtn = document.getElementById('download-btn');
+
+            // Show hero immediately
+            heroSection.classList.add('visible');
+
+
+            // --- Interactions ---
+
+            registerBtn.addEventListener('click', () => {
+                // Enable scroll explicitly
+                document.body.classList.add('visible-flow');
+                document.body.style.overflow = 'auto'; // Force override inline if any
+
+                // Show registration form
+                registrationSection.classList.add('visible');
+
+                // Show header
+                header.classList.add('visible');
+
+                // Smooth scroll to registration with slight delay to ensure layout update
+                setTimeout(() => {
+                    registrationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            });
+
+            // --- Form Functionality ---
+
+            // Photo Preview Logic
+            const photoInput = document.getElementById('profile-pic');
+            const photoPreview = document.getElementById('photo-preview');
+            const placeholderIcon = document.getElementById('placeholder-icon');
+            const cardPhoto = document.getElementById('card-photo');
+
+            photoInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        photoPreview.src = event.target.result;
+                        photoPreview.style.display = 'block';
+                        placeholderIcon.style.display = 'none';
+                        // Also set on card for later
+                        cardPhoto.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Form submission is now handled by the AJAX script above to send data to register_backend.php
+
+
+            // Download Feature
+            downloadBtn.addEventListener('click', () => {
+                const card = document.getElementById('player-card');
+
+                // Use html2canvas
+                html2canvas(card, {
+                    backgroundColor: null, // Transparent/Use CSS bg
+                    scale: 2, // High Quality
+                    useCORS: true, // Handle cross-origin images if any
+                    logging: true
+                }).then(canvas => {
+                    const link = document.createElement('a');
+
+                    // Dynamic Filename: player_id_full_name.png
+                    const playerId = document.getElementById('card-id').innerText || 'PPL-0000';
+                    const fullName = document.getElementById('card-name').innerText || 'PLAYER';
+
+                    // Sanitize name
+                    const safeName = fullName.replace(/[^a-zA-Z0-9]/g, '_');
+
+                    link.download = `${playerId}_${safeName}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    document.body.appendChild(link); // Append to DOM for Firefox support
+                    link.click();
+                    document.body.removeChild(link); // Clean up
+                }).catch(err => {
+                    console.error("Download failed:", err);
+                    alert("Could not generate image. Please try taking a screenshot.");
+                });
+            });
+
+            homeBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        });
+
+        // --- Simplified Confetti Logic (No external lib) ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function startConfetti() {
+            particles = [];
+
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20 - 5, // Upward bias
+                    size: Math.random() * 8 + 4,
+                    // Golden Confetti Colors
+                    color: ['#D4AF37', '#FFD700', '#DAA520', '#F5D76E', '#C5A028'][Math.floor(Math.random() * 5)],
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10
+                });
+            }
+
+            requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2; // Gravity
+                p.rotation += p.rotationSpeed;
+                p.vx *= 0.96; // Air resistance
+
+                if (p.y < canvas.height && p.size > 0.1) {
+                    active = true;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                }
+            });
+
+            if (active) requestAnimationFrame(updateConfetti);
+        }
+
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const introText = document.getElementById('intro-text-container');
+            const curtainSection = document.getElementById('curtain-raiser');
+            const leftCurtain = document.getElementById('left-curtain');
+            const rightCurtain = document.getElementById('right-curtain');
+            const stageFloor = document.getElementById('stage-floor');
+
+            const introImage = document.getElementById('intro-image-block');
+            const heroSection = document.getElementById('hero');
+            const header = document.getElementById('app-header');
+
+            const registerBtn = document.getElementById('register-btn');
+            const registrationSection = document.getElementById('registration-section');
+
+            // 1. Show Welcome Text
+            setTimeout(() => {
+                introText.classList.add('show');
+            }, 500);
+
+            // 2. Open Curtains Sequence (After welcome text fades)
+            setTimeout(() => {
+                // Open curtains
+                leftCurtain.style.transform = "translateX(-130%) rotateY(20deg)";
+                rightCurtain.style.transform = "translateX(130%) rotateY(-20deg)";
+                stageFloor.style.opacity = "0.4"; // Slight dim before hiding
+                stageFloor.style.transition = "opacity 2s ease";
+
+                // Show Intro Image
+                setTimeout(() => {
+                    introImage.classList.add('visible');
+                    stageFloor.style.opacity = "0";
+                    startConfetti(); // Trigger Golden Confetti for the image reveal
+                }, 1000);
+
+            }, 4500); // Start after welcome text animation (4s + 0.5s)
+
+            // 3. Transition to Logo/Hero
+            setTimeout(() => {
+                // Fade out intro image
+                introImage.style.transition = "opacity 2.5s ease"; // Smoother fade out
+                introImage.classList.remove('visible');
+
+                // Show Hero (Logo Reveal)
+                setTimeout(() => {
+                    heroSection.classList.remove('hidden');
+                    heroSection.style.opacity = '0';
+                    heroSection.classList.add('visible');
+                    gsap.fromTo(heroSection, { opacity: 0 }, { opacity: 1, duration: 2 });
+                }, 500);
+
+                // Cleanup intro elements
+                setTimeout(() => {
+                    curtainSection.style.display = 'none';
+                    introImage.style.display = 'none';
+                    introText.style.display = 'none';
+                }, 3000);
+            }, 10000); // 10s total (4.5s intro + 5.5s image display)
+
+            // 4. Registration Logic
+            registerBtn.addEventListener('click', () => {
+                // Hide hero
+                heroSection.classList.remove('visible');
+                heroSection.classList.add('hidden');
+
+                // Show registration
+                registrationSection.classList.remove('hidden');
+                registrationSection.classList.add('visible');
+
+                document.body.classList.add('registration-active');
+                header.classList.add('visible');
+                registrationSection.scrollTop = 0;
+            });
+        });
+    </script>
+</body>
+
+</html>
